@@ -1,0 +1,120 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa; /* Color de fondo ligero */
+    padding-top: 56px; /* Altura de la navbar fija */
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+/* Hero Section (index.html) */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../img/background.jpg') no-repeat center center;
+    background-size: cover;
+    height: 70vh; /* Altura de la sección hero */
+    min-height: 500px;
+    position: relative;
+    color: white;
+}
+
+.hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.hero-section p.lead {
+    font-size: 1.4rem;
+    font-weight: 300;
+}
+
+/* Icon Boxes (index.html) */
+.icon-box {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.icon-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.icon-box i {
+    color: var(--bs-primary); /* Usa la variable de color de Bootstrap */
+}
+
+/* Card General */
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Forms */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Color de foco de Bootstrap primary */
+    border-color: #86b7fe;
+}
+
+/* Votar Page - Candidate Cards */
+#candidatosContainer .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 15px; /* Añade un poco de espacio abajo */
+}
+
+.candidate-img-wrapper {
+    width: 200px;  /* Ancho deseado */
+    height: 200px; /* Alto deseado para forma cuadrada */
+    margin: 15px auto 10px auto; /* Espaciado */
+    overflow: hidden; /* Oculta partes de la imagen que se desbordan */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    border: 3px solid var(--bs-primary); /* Borde alrededor de la imagen */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.candidate-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta la imagen para que cubra todo el espacio sin distorsionar */
+    display: block; /* Asegura que la imagen ocupe el 100% del contenedor */
+}
+
+#candidatosContainer .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+}
+
+/* Estadísticas Page */
+.progress {
+    height: 25px; /* Altura de las barras de progreso */
+    border-radius: 5px;
+}
+
+.progress-bar {
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+#ganadorCandidato {
+    font-weight: bold;
+    font-size: 1.8rem;
+    color: var(--bs-success);
+}

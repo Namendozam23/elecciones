@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votar - Elecciones Primarias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="etyle.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="mainNavbar"></nav>
+
+    <div class="container py-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h2 class="text-center mb-4">Emite tu Voto</h2>
+                <div id="votarMessage" class="alert d-none" role="alert"></div>
+                <div id="candidatosContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    </div>
+                <div class="text-center mt-5" id="votarBtnContainer">
+                    <button id="submitVoteBtn" class="btn btn-success btn-lg">Votar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p>&copy; 2025 Elecciones Primarias. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="votacion.js"></script>
+    <script>
+        // Lógica específica para la página de votación
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar();
+            updateNavbar();
+
+            if (!isUserLoggedIn()) {
+                showMessage(document.getElementById('votarMessage'), 'Debe iniciar sesión para votar.', 'warning');
+                setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                return;
+            }
+
+            const currentUserCI = getLoggedInUserCI();
+            const votanteActual = getVotantes().find(v => v.cedula === currentUserCI);
+
+            if (votanteActual && votanteActual.haVotado) {
+                showMessage(document.getElementById('votarMessage'), `Usted ya ha emitido su voto por ${getCandidatos().find(c => c.id === votanteActual.votoCandidatoId)?.nombre || 'un candidato'}.`, 'info');
+                document.getElementById('submitVoteBtn').classList.add('d-none');
+                renderCandidatos(true); // Renderiza pero deshabilitado
+            } else {
+                renderCandidatos(false); // Renderiza habilitado
+            }
+
+            document.getElementById('submitVoteBtn').addEventListener('click', () => {
+                const selectedCandidate = document.querySelector('input[name="candidato"]:checked');
+                const votarMessage = document.getElementById('votarMessage');
+                votarMessage.classList.add('d-none');
+
+                if (!selectedCandidate) {
+                    showMessage(votarMessage, 'Por favor, selecciona un candidato para votar.', 'danger');
+                    return;
+                }
+
+                const candidatoId = selectedCandidate.value;
+                const candidatos = getCandidatos();
+                const votantes = getVotantes();
+
+                // Actualizar voto del candidato
+                const candidatoVotado = candidatos.find(c => c.id === candidatoId);
+                if (candidatoVotado) {
+                    candidatoVotado.votos++;
+                }
+
+                // Marcar votante como que ya votó
+                if (votanteActual) {
+                    votanteActual.haVotado = true;
+                    votanteActual.votoCandidatoId = candidatoId;
+                }
+
+                saveCandidatos(candidatos);
+                saveVotantes(votantes);
+
+                showMessage(votarMessage, '¡Voto registrado exitosamente!', 'success');
+                document.getElementById('submitVoteBtn').classList.add('d-none'); // Deshabilitar botón
+                renderCandidatos(true); // Volver a renderizar para deshabilitar las opciones
+            });
+        });
+
+        function renderCandidatos(disabled = false) {
+        const candidatosContainer = document.getElementById('candidatosContainer');
+        candidatosContainer.innerHTML = '';
+        const candidatos = getCandidatos();
+        const currentUserCI = getLoggedInUserCI();
+        const votanteActual = getVotantes().find(v => v.cedula === currentUserCI);
+
+        candidatos.forEach(candidato => {
+            const checked = (votanteActual && votanteActual.votoCandidatoId === candidato.id) ? 'checked' : '';
+            const disabledAttr = disabled ? 'disabled' : '';
+
+            candidatosContainer.innerHTML += `
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="candidate-img-wrapper">
+                            <img src="${candidato.imagenUrl}" class="card-img-top candidate-img" alt="${candidato.nombre}">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">${candidato.nombre}</h5>
+                            <p class="card-text text-muted">${candidato.partido}</p>
+                            <p class="card-text small">"Mi compromiso es trabajar por un futuro mejor para todos."</p>
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input" type="radio" name="candidato" id="candidato${candidato.id}" value="${candidato.id}" ${checked} ${disabledAttr}>
+                                <label class="form-check-label ms-2" for="candidato${candidato.id}">
+                                    Seleccionar
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Elecciones Primarias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="etyle.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="mainNavbar"></nav>
+
+    <div class="container py-5 mt-5">
+        <h2 class="text-center mb-4">Estadísticas de Votación</h2>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <h3>Total de Votantes Registrados</h3>
+                    <p class="display-4" id="totalVotantes"></p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <h3>Total de Votos Emitidos</h3>
+                    <p class="display-4" id="totalVotos"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg p-4 mb-5">
+            <h3 class="mb-4 text-center">Resultados por Candidato</h3>
+            <div id="resultadosCandidatos">
+                </div>
+            <div class="text-center mt-4">
+                <h4 id="ganadorCandidato" class="text-success d-none"></h4>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p>&copy; 2025 Elecciones Primarias. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="votacion.js"></script>
+    <script>
+        // Lógica específica para la página de estadísticas
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar();
+            updateNavbar();
+            displayStatistics();
+        });
+
+        function displayStatistics() {
+            const votantes = getVotantes();
+            const candidatos = getCandidatos();
+
+            const totalVotantes = votantes.length;
+            const totalVotos = candidatos.reduce((sum, c) => sum + c.votos, 0);
+
+            document.getElementById('totalVotantes').textContent = totalVotantes;
+            document.getElementById('totalVotos').textContent = totalVotos;
+
+            const resultadosCandidatosDiv = document.getElementById('resultadosCandidatos');
+            resultadosCandidatosDiv.innerHTML = '';
+
+            let maxVotos = -1;
+            let ganadorNombre = '';
+
+            if (totalVotos === 0) {
+                resultadosCandidatosDiv.innerHTML = '<p class="text-center text-muted">Aún no se han registrado votos.</p>';
+                document.getElementById('ganadorCandidato').classList.add('d-none');
+                return;
+            }
+
+            // Ordenar candidatos por votos (descendente)
+            const candidatosOrdenados = [...candidatos].sort((a, b) => b.votos - a.votos);
+
+            candidatosOrdenados.forEach(candidato => {
+                const porcentaje = totalVotos > 0 ? ((candidato.votos / totalVotos) * 100).toFixed(2) : 0;
+
+                resultadosCandidatosDiv.innerHTML += `
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>${candidato.nombre} (${candidato.partido})</strong>
+                            <span>${candidato.votos} votos (${porcentaje}%)</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: ${porcentaje}%;" aria-valuenow="${porcentaje}" aria-valuemin="0" aria-valuemax="100">${porcentaje}%</div>
+                        </div>
+                    </div>
+                `;
+
+                if (candidato.votos > maxVotos) {
+                    maxVotos = candidato.votos;
+                    ganadorNombre = candidato.nombre;
+                } else if (candidato.votos === maxVotos && ganadorNombre !== '') {
+                    // En caso de empate, puedes manejarlo como desees (ej. mostrar ambos, o el primero en la lista)
+                    ganadorNombre += ` y ${candidato.nombre}`; // Ejemplo simple de empate
+                }
+            });
+
+            const ganadorElement = document.getElementById('ganadorCandidato');
+            if (ganadorNombre) {
+                ganadorElement.textContent = `Ganador(es) Provisional(es): ${ganadorNombre}`;
+                ganadorElement.classList.remove('d-none');
+            }
+        }
+    </script>
+</body>
+</html>
